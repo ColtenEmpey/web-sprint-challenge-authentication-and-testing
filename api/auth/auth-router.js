@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const bycript = require("bcryptjs")
-const {checkUsernameFree, checkUsernameExists, checkPasswordLength} = require("../middleware/authMiddleware")
+const {checkUsernameFree, checkUsernameExists, checkPasswordLength, checkLoginParams} = require("../middleware/authMiddleware")
 const User = require("../users/users-model.js")
 
-router.post('/register', checkUsernameFree, (req, res, next) => {
+router.post('/register', checkLoginParams, checkUsernameFree, (req, res, next) => {
   const {username, password} = req.body
   const hash = bycript.hashSync(password, 8)
   User.add({username, password: hash})
@@ -41,18 +41,16 @@ router.post('/register', checkUsernameFree, (req, res, next) => {
   */
 });
 
-router.post('/login', checkUsernameExists, (req, res, next) => {
-  res.end('implement login, please!');
+router.post('/login',checkLoginParams, checkUsernameExists, (req, res, next) => {
   const {password} = req.body
     if(bycript.compareSync(password, req.user.password)){
-
-
-      req.session.user = req.user
-      res.json({ message: `Welcome ${req.user.username}`})
+      // req.session.user = req.user
+      res.json({ message: `Welcome ${req.user.username}`, token: "token"})
     }
     else{
       next({status: 401, message: 'Invalid credentials'})
     }
+  // res.json({message: "todo bain"})
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.

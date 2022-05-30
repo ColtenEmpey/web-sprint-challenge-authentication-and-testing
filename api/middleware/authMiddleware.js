@@ -9,32 +9,40 @@ function restricted(req, res, next) {
   }
 }
 
-async function checkUsernameFree(req, res, next) {
-  const {username, password} = req.body
-  if(username && password){
+async function checkUsernameFree(req, res, next) {  
     try {
         const users = await User.findBy({username: req.body.username })
         if(!users.length) next()
         else{
           next({message : "username taken", status : 422})
         }
-      
     }
     catch(err){
       next(err)
     }
   }
-  else {next({message: "username and password required", status: 422})}
+  
+
+
+async function checkLoginParams(req, res, next) {
+  try {
+    const {username, password} = req.body
+    if(username && password){next()}
+    else {next({message: "username and password required", status: 422})}
+  }
+  
+  catch(err){
+    next(err)
+  }
 }
-
-
 
 async function checkUsernameExists(req, res, next) {
   try {
     const user = await User.findBy({username: req.body.username})
     if(user.length){ 
       req.user = user[0]
-      next()}
+      next()
+    }
     else{
       next({message : "Invalid credentials", status : 401})
     }
@@ -64,4 +72,5 @@ async function checkPasswordLength(req, res, next) {
 module.exports = {restricted,
      checkUsernameFree,
      checkUsernameExists,
+     checkLoginParams,
      checkPasswordLength}
