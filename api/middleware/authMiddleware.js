@@ -14,7 +14,7 @@ async function checkUsernameFree(req, res, next) {
         const users = await User.findBy({username: req.body.username })
         if(!users.length) next()
         else{
-          next({message : "username taken", status : 422})
+          next({message : "username taken", status : 400})
         }
     }
     catch(err){
@@ -22,13 +22,11 @@ async function checkUsernameFree(req, res, next) {
     }
   }
   
-
-
 async function checkLoginParams(req, res, next) {
   try {
     const {username, password} = req.body
     if(username && password){next()}
-    else {next({message: "username and password required", status: 422})}
+    else {next({message: "username and password required", status: 400})}
   }
   
   catch(err){
